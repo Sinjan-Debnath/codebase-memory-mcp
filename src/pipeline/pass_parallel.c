@@ -48,6 +48,7 @@ enum { PP_CSHARP_M_PREFIX_LEN = 2 };
 #include "pipeline/pipeline_internal.h"
 #include "pipeline/pass_lsp_cross.h" /* cbm_pxc_* helpers for fused cross-file LSP */
 #include "pipeline/lsp_resolve.h"
+#include "helpers.h" /* cbm_kind_in_set_free_cache — per-worker-thread cache teardown */
 #include "pipeline/worker_pool.h"
 #include "foundation/compat.h"
 #include "foundation/compat_thread.h"
@@ -635,6 +636,7 @@ static void extract_worker(int worker_id, void *ctx_ptr) {
 
     /* Final cleanup (parser already destroyed in loop, just slab state) */
     cbm_slab_destroy_thread();
+    cbm_kind_in_set_free_cache(); /* free this worker thread's node-type bitset cache */
 }
 
 static void merge_pkg_entries(cbm_pipeline_ctx_t *ctx, cbm_pkg_entries_t *pkg_entries,

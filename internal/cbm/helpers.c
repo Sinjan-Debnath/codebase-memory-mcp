@@ -399,6 +399,21 @@ bool cbm_kind_in_set(TSNode node, const char **types) {
     return kind_in_set_strcmp(node, (const char *const *)types);
 }
 
+/* Free the calling thread's node-type bitset cache (the calloc'd `bits` arrays
+ * that cbm_kind_in_set builds lazily). The cache is thread-local, so each worker
+ * thread and the main thread must call this at teardown (worker exit / process
+ * exit) for LeakSanitizer to report no leak. Safe if no cache was ever built. */
+void cbm_kind_in_set_free_cache(void) {
+    for (int i = 0; i < KS_SLOTS; i++) {
+        free(ks_cache[i].bits);
+        ks_cache[i].bits = NULL;
+        ks_cache[i].lang = NULL;
+        ks_cache[i].types = NULL;
+        ks_cache[i].nsyms = 0;
+        ks_cache[i].exact = false;
+    }
+}
+
 bool cbm_has_ancestor_kind(TSNode node, const char *kind, int max_depth) {
     TSNode cur = node;
     for (int i = 0; i < max_depth; i++) {

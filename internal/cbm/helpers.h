@@ -42,6 +42,10 @@ TSNode cbm_find_child_by_kind(TSNode parent, const char *kind);
 // Check if node kind matches a set of types (NULL-terminated array of strings).
 bool cbm_kind_in_set(TSNode node, const char **types);
 
+// Free the calling thread's cbm_kind_in_set bitset cache (call at thread/process
+// teardown so the thread-local cache is not reported as a leak).
+void cbm_kind_in_set_free_cache(void);
+
 // Check if node has an ancestor of the given kind, within max_depth levels.
 bool cbm_has_ancestor_kind(TSNode node, const char *kind, int max_depth);
 
