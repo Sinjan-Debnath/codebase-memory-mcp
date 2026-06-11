@@ -41,7 +41,7 @@
       "applicationSubCategory": "Model Context Protocol (MCP) server",
       "operatingSystem": "macOS, Linux, Windows",
       "softwareVersion": "0.7.0",
-      "description": "An open-source MCP server that indexes a codebase into a persistent knowledge graph of functions, classes, call chains, HTTP routes, and cross-service links, so AI coding agents answer structural questions with roughly 120x fewer tokens than file-by-file search. Parses 159 languages via tree-sitter with Hybrid LSP semantic type resolution for 6 language families. Ships as a single static C binary with zero runtime dependencies.",
+      "description": "An open-source MCP server that indexes a codebase into a persistent knowledge graph of functions, classes, call chains, HTTP routes, and cross-service links, so AI coding agents answer structural questions with roughly 120x fewer tokens than file-by-file search. Parses 159 languages via tree-sitter with Hybrid LSP semantic type resolution for 9 language families. Ships as a single static C binary with zero runtime dependencies.",
       "url": "https://deusdata.github.io/codebase-memory-mcp/",
       "downloadUrl": "https://github.com/DeusData/codebase-memory-mcp/releases/latest",
       "codeRepository": "https://github.com/DeusData/codebase-memory-mcp",
@@ -55,7 +55,7 @@
       },
       "featureList": [
         "Indexes 159 programming languages via vendored tree-sitter grammars",
-        "Hybrid LSP semantic type resolution for Python, TypeScript/JavaScript, PHP, C#, Go, and C/C++",
+        "Hybrid LSP semantic type resolution for Python, TypeScript/JavaScript, PHP, C#, Go, C/C++, Java, Kotlin, and Rust",
         "14 MCP tools for structural search, call-path tracing, and Cypher graph queries",
         "Semantic vector code search via bundled nomic-embed-code embeddings (no API key, fully local)",
         "Semantic graph edges (SEMANTICALLY_RELATED) and near-clone detection (SIMILAR_TO, MinHash + LSH)",
@@ -141,7 +141,7 @@
           "name": "Which programming languages does codebase-memory-mcp support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "It supports 159 languages through vendored tree-sitter grammars compiled into the binary, including Python, Go, JavaScript, TypeScript, Rust, Java, C, C++, C#, PHP, Ruby, Kotlin, Swift, and many more. Six language families — Python, TypeScript/JavaScript, PHP, C#, Go, and C/C++ — additionally get Hybrid LSP semantic type resolution."
+            "text": "It supports 159 languages through vendored tree-sitter grammars compiled into the binary, including Python, Go, JavaScript, TypeScript, Rust, Java, C, C++, C#, PHP, Ruby, Kotlin, Swift, and many more. Nine language families — Python, TypeScript/JavaScript, PHP, C#, Go, C/C++, Java, Kotlin, and Rust — additionally get Hybrid LSP semantic type resolution."
           }
         },
         {
@@ -559,6 +559,9 @@
                 <tr><td>C#</td><td>Global usings, file-scoped namespaces, records (incl. C# 12 primary constructors), LINQ method syntax, <code>async Task&lt;T&gt;</code>/<code>ValueTask&lt;T&gt;</code> unwrap, generic methods, <code>var</code> inference, and common BCL stdlib.</td></tr>
                 <tr><td>Go</td><td>Pre-built per-package cross-file registry, generics, embedded structs, interface satisfaction, and package-aware import resolution.</td></tr>
                 <tr><td>C / C++</td><td>Shared cross-language registry: macros, <code>typedef</code> chains, and header-vs-source linking on the C side; templates, namespaces, <code>auto</code> inference, and class-hierarchy method resolution on the C++ side.</td></tr>
+                <tr><td>Java <em>(new in v0.8.0)</em></td><td>Imports (single-type, on-demand, static), class hierarchies with <code>this</code>/<code>super</code> dispatch, generics, annotations, overload matching by arity and parameter types, lambdas and method references bound to functional interfaces, and common JDK stdlib.</td></tr>
+                <tr><td>Kotlin <em>(new in v0.8.0)</em></td><td>Imports and same-package resolution, classes / objects / companion objects, extension functions, data classes, nullable-type unwrapping, scope functions (<code>let</code>/<code>apply</code>/<code>run</code>/<code>also</code>/<code>with</code>), infix calls, and common stdlib.</td></tr>
+                <tr><td>Rust <em>(new in v0.8.0)</em></td><td><code>use</code> declarations and module paths, <code>impl</code> blocks and trait methods, struct fields, generics with trait bounds, operator-trait desugaring, derive-macro method synthesis, UFCS static paths, and common std prelude.</td></tr>
             </tbody>
         </table>
         <p class="muted">
@@ -660,7 +663,7 @@
             </div>
             <div class="feature">
                 <h3>Hybrid LSP type resolution</h3>
-                <p>Language-server-grade type inference for Python, TS/JS, PHP, C#, Go, and C/C++ — embedded in the binary, no server process or per-project setup.</p>
+                <p>Language-server-grade type inference for Python, TS/JS, PHP, C#, Go, C/C++, Java, Kotlin, and Rust — embedded in the binary, no server process or per-project setup.</p>
             </div>
             <div class="feature">
                 <h3>Pure C, zero dependencies</h3>
