@@ -780,6 +780,8 @@ TEST(repro_grammar_config_pkl) {
     static const char src[] =
         "module cbm.Config\n"
         "\n"
+        "function makeUrl(host: String, port: Int): String = \"http://\\(host):\\(port)\"\n"
+        "\n"
         "class Server {\n"
         "  host: String = \"localhost\"\n"
         "  port: Int = 8080\n"

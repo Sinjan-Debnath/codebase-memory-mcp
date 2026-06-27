@@ -917,6 +917,8 @@ static const char *module_parents_commonlisp[] = {"source", NULL};
 static const char *module_parents_matlab[] = {"source_file", NULL};
 static const char *module_parents_form[] = {"source_file", NULL};
 static const char *module_parents_magma[] = {"source_file", NULL};
+/* tree-sitter-properties roots at `file`. */
+static const char *module_parents_properties[] = {"file", "source_file", NULL};
 
 // Check if parent node kind matches direct-or-grandparent for scripting languages.
 // Returns true if pk matches root_kind, or pk matches wrapper_kind and grandparent is root_kind.
@@ -989,6 +991,7 @@ static const char **get_module_parents(CBMLanguage lang) {
         return module_parents_php;
     case CBM_LANG_PERL:
     case CBM_LANG_GROOVY:
+    case CBM_LANG_DOCKERFILE: // top-level instructions are children of source_file
         return module_parents_zig;
     case CBM_LANG_R:
         return module_parents_php;
@@ -1004,6 +1007,10 @@ static const char **get_module_parents(CBMLanguage lang) {
         return module_parents_form;
     case CBM_LANG_MAGMA:
         return module_parents_magma;
+    case CBM_LANG_PROPERTIES:
+        return module_parents_properties;
+    case CBM_LANG_GOMOD: // require_directive lives at source_file top level
+        return module_parents_zig;
     default:
         return NULL;
     }

@@ -1338,7 +1338,8 @@ static const char *capnp_import_types[] = {"import", "extends", "using_directive
 static const char *capnp_var_types[] = {"const", NULL};
 static const char *capnp_module_types[] = {"source", NULL};
 static const char *properties_var_types[] = {"property", NULL};
-static const char *properties_module_types[] = {"source_file", NULL};
+/* tree-sitter-properties roots the tree at `file`, not `source_file`. */
+static const char *properties_module_types[] = {"file", "source_file", NULL};
 static const char *sshconfig_module_types[] = {"source_file", NULL};
 static const char *bibtex_call_types[] = {"command", NULL};
 static const char *bibtex_module_types[] = {"document", NULL};
@@ -1421,8 +1422,11 @@ static const char *kconfig_class_types[] = {"config", "menuconfig", "choice", "t
 static const char *kconfig_import_types[] = {"source", NULL};
 static const char *kconfig_branch_types[] = {"if", NULL};
 static const char *kconfig_module_types[] = {"source", NULL};
-static const char *bitbake_func_types[] = {"function_definition", "python_function_definition",
-                                           "recipe", NULL};
+/* `anonymous_python_function` is the tree-sitter-bitbake node for a
+ * `python do_foo() {...}` task; `function_definition` is a `do_foo() {...}`
+ * shell task. (`recipe` is the file root, not a function.) */
+static const char *bitbake_func_types[] = {"function_definition",
+                                           "anonymous_python_function", NULL};
 static const char *bitbake_var_types[] = {"variable_assignment", NULL};
 static const char *bitbake_call_types[] = {"call", NULL};
 static const char *bitbake_import_types[] = {
