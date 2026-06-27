@@ -72,8 +72,8 @@
  *   STRUCTURAL WITH DEFS (dims 1-5 + R):
  *     DOCKERFILE     -- var_types = {env_instruction, arg_instruction} -> "Variable".
  *     GOMOD          -- var_types = {require_directive, replace_directive} -> "Variable".
- *     K8S            -- semantic extractor (cbm_extract_k8s); extracts kind -> "Class".
- *     KUSTOMIZE      -- semantic extractor (cbm_extract_k8s); extracts kind -> "Class".
+ *     K8S            -- semantic extractor (cbm_extract_k8s); extracts kind -> "Resource".
+ *     KUSTOMIZE      -- semantic extractor (cbm_extract_k8s); extracts kind -> "Resource".
  *
  *   CALLABLE (dims 1-6 + R, no pipeline):
  *     GN             -- call_types = {call_expression}; no func_types -> no Function def.
@@ -656,12 +656,12 @@ TEST(repro_grammar_build_just) {
  * Idiomatic Kubernetes manifest with a Deployment (apiVersion: apps/v1,
  * kind: Deployment). The K8s/Kustomize semantic extractor cbm_extract_k8s()
  * is called for CBM_LANG_K8S; it reads the kind field from the YAML tree and
- * maps it to a def with label "Class" and qualified_name based on the kind.
+ * maps it to a def with label "Resource" and qualified_name based on the kind.
  * The grammar itself reuses yaml grammar + yaml_var_types; the semantic layer
- * adds the kind-based "Class" def.
+ * adds the kind-based "Resource" def.
  *
- * Dims asserted: 1-5 + R ("Class" for the Deployment kind).
- * Dim 5 expected GREEN: "Class" def extracted by cbm_extract_k8s for the kind.
+ * Dims asserted: 1-5 + R ("Resource" for the Deployment kind).
+ * Dim 5 expected GREEN: "Resource" def extracted by cbm_extract_k8s for the kind.
  *   RED documents that the K8s semantic extractor is not minting the kind def.
  * Dims 6-8 SKIPPED: no call_types in the K8s spec; no pipeline.
  * Expected GREEN: dims 1-5. Robustness should pass.
@@ -695,7 +695,7 @@ TEST(repro_grammar_build_k8s) {
         "              value: info\n";
     static const char bad[] = "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name:";
     if (build_struct_battery("K8s", src, CBM_LANG_K8S, "deployment.yaml",
-                             "Class", NULL) != 0)
+                             "Resource", NULL) != 0)
         return 1;
     return build_robustness("K8s", bad, CBM_LANG_K8S, "deployment.yaml");
 }
@@ -703,11 +703,11 @@ TEST(repro_grammar_build_k8s) {
 /* ── Kustomize ────────────────────────────────────────────────────────────────
  * Idiomatic kustomization.yaml: the Kustomize overlay tool's root file
  * (kind: Kustomization). cbm_extract_k8s() is called for CBM_LANG_KUSTOMIZE
- * just as for CBM_LANG_K8S; it should mint a "Class" def for the
+ * just as for CBM_LANG_K8S; it should mint a "Resource" def for the
  * "Kustomization" kind, which is the canonical Kustomize resource kind.
  *
- * Dims asserted: 1-5 + R ("Class" for the Kustomization kind).
- * Dim 5 expected GREEN: "Class" def for "Kustomization" from cbm_extract_k8s.
+ * Dims asserted: 1-5 + R ("Resource" for the Kustomization kind).
+ * Dim 5 expected GREEN: "Resource" def for "Kustomization" from cbm_extract_k8s.
  *   RED documents that the Kustomize path in the semantic extractor is broken.
  * Dims 6-8 SKIPPED: no call_types in the Kustomize spec; no pipeline.
  * Expected GREEN: dims 1-5. Robustness should pass.
@@ -738,7 +738,7 @@ TEST(repro_grammar_build_kustomize) {
         "      - PORT=8080\n";
     static const char bad[] = "apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nresources:";
     if (build_struct_battery("Kustomize", src, CBM_LANG_KUSTOMIZE,
-                             "kustomization.yaml", "Class", NULL) != 0)
+                             "kustomization.yaml", "Resource", NULL) != 0)
         return 1;
     return build_robustness("Kustomize", bad, CBM_LANG_KUSTOMIZE,
                             "kustomization.yaml");
