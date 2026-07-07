@@ -1577,10 +1577,31 @@ static void handle_rpc(cbm_http_conn_t *c, const cbm_http_req_t *req, cbm_mcp_se
 
 /* ── Request dispatch ─────────────────────────────────────────── */
 
+/* True when the Host header names the loopback interface the server binds to
+ * (with or without a port). Anything else means the request reached us under a
+ * name that is not loopback — a rebinding DNS host or a proxy pointed at the
+ * local port — which is the DNS-rebinding / cross-site vector against a
+ * localhost-only service. */
+static bool host_is_loopback(const char *host) {
+    return cbm_http_path_match(host, "localhost") || cbm_http_path_match(host, "localhost:*") ||
+           cbm_http_path_match(host, "127.0.0.1") || cbm_http_path_match(host, "127.0.0.1:*") ||
+           cbm_http_path_match(host, "[::1]") || cbm_http_path_match(host, "[::1]:*");
+}
+
 static void dispatch_request(cbm_http_server_t *srv, cbm_http_conn_t *c,
                              const cbm_http_req_t *req) {
     /* Build per-request CORS headers (only reflects localhost origins) */
     update_cors(req);
+
+    /* DNS-rebinding / cross-site guard: the server binds to loopback only, so a
+     * request carrying any non-loopback Host was routed here under a foreign
+     * name (a rebinding DNS record, a proxy) and must be refused before it can
+     * reach a state-changing endpoint. A bare request with no Host header
+     * (HTTP/1.0 local tooling) is still allowed. */
+    if (req->host[0] != '\0' && !host_is_loopback(req->host)) {
+        cbm_http_replyf(c, 403, g_cors, "%s", "{\"error\":\"forbidden host\"}");
+        return;
+    }
 
     bool is_get = strcmp(req->method, "GET") == 0;
     bool is_post = strcmp(req->method, "POST") == 0;

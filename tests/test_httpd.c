@@ -1085,6 +1085,31 @@ TEST(git_context_resolve_no_hang_under_live_ui_sockets) {
 #endif
 }
 
+/* The server binds to loopback only. A request carrying a non-loopback Host
+ * header reached it under a foreign name — the DNS-rebinding / cross-site
+ * vector against a localhost service — and must be refused before routing. A
+ * loopback Host (or none) proceeds normally. */
+TEST(ui_server_rejects_non_loopback_host) {
+    th_server_t ts;
+    ASSERT_EQ(th_server_start(&ts), 0);
+    int port = cbm_http_server_port(ts.srv);
+    char resp[4096];
+
+    int n = th_http(port, "GET / HTTP/1.1\r\nHost: evil.example.com\r\n\r\n", resp, sizeof(resp));
+    ASSERT_GT(n, 0);
+    ASSERT_EQ(th_status(resp), 403);
+
+    /* A loopback Host is not rejected (routes on to the normal 404 stub). */
+    char req[128];
+    snprintf(req, sizeof(req), "GET / HTTP/1.1\r\nHost: 127.0.0.1:%d\r\n\r\n", port);
+    n = th_http(port, req, resp, sizeof(resp));
+    ASSERT_GT(n, 0);
+    ASSERT_NEQ(th_status(resp), 403);
+
+    th_server_stop(&ts);
+    PASS();
+}
+
 /* ── Suite ────────────────────────────────────────────────────── */
 
 SUITE(httpd) {
@@ -1113,6 +1138,7 @@ SUITE(httpd) {
     RUN_TEST(httpd_listen_port_collision_returns_null);
 
     /* Full UI server */
+    RUN_TEST(ui_server_rejects_non_loopback_host);
     RUN_TEST(ui_server_unknown_path_404);
     RUN_TEST(ui_server_root_serves_stub_404);
     RUN_TEST(ui_server_cors_localhost_reflected);
